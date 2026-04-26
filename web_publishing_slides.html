@@ -1,0 +1,2850 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>웹 퍼블리싱 기초</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Fira+Code:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #f5f7ff;
+        --white: #fff;
+        --blue: #4f7cff;
+        --blue-lt: #ebf0ff;
+        --blue-bd: #c5d3ff;
+        --teal: #00bfa5;
+        --teal-lt: #e0f7f4;
+        --teal-bd: #99ddd5;
+        --coral: #ff5c5c;
+        --coral-lt: #fff0f0;
+        --amber: #ff9800;
+        --amber-lt: #fff3e0;
+        --purple: #8b5cf6;
+        --purple-lt: #f3eeff;
+        --purple-bd: #c4b5fd;
+        --green: #22c97a;
+        --green-lt: #e8fbf1;
+        --pink: #f472b6;
+        --pink-lt: #fdf2f8;
+        --text: #1b1f3b;
+        --sub: #6b7280;
+        --border: #e2e8f4;
+        --code-bg: #1e2235;
+        --code-fg: #7dd3fc;
+      }
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        height: 54px;
+      }
+      .nav-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--blue);
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-btn {
+        background: var(--blue-lt);
+        border: none;
+        color: var(--blue);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 6px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .nav-btn:hover {
+        background: var(--blue-bd);
+      }
+      .nav-counter {
+        font-size: 13px;
+        color: var(--sub);
+        font-weight: 600;
+        min-width: 52px;
+        text-align: center;
+      }
+      .progress {
+        position: fixed;
+        top: 54px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--border);
+        z-index: 99;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--blue), var(--teal));
+        transition: width 0.3s ease;
+      }
+      .slides {
+        padding-top: 54px;
+      }
+      .slide {
+        display: none;
+        min-height: calc(100vh - 54px);
+        padding: 36px 56px 48px;
+        flex-direction: column;
+        animation: fi 0.22s ease;
+      }
+      .slide.active {
+        display: flex;
+      }
+      @keyframes fi {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .s-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: var(--blue);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .s-label::before {
+        content: "";
+        display: block;
+        width: 18px;
+        height: 3px;
+        background: var(--blue);
+        border-radius: 2px;
+      }
+      .s-h {
+        font-size: 27px;
+        font-weight: 900;
+        margin-bottom: 22px;
+        line-height: 1.2;
+      }
+      .card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px 22px;
+        border: 1.5px solid var(--border);
+        box-shadow: 0 4px 20px rgba(79, 124, 255, 0.08);
+      }
+      .card-h {
+        font-size: 13.5px;
+        font-weight: 700;
+        margin-bottom: 11px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: inline-block;
+      }
+      .code {
+        background: var(--code-bg);
+        color: var(--code-fg);
+        font-family: "Fira Code", monospace;
+        font-size: 12px;
+        padding: 13px 15px;
+        border-radius: 10px;
+        line-height: 1.8;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .hl-sel {
+        color: #fcd34d;
+      }
+      .hl-prop {
+        color: #7dd3fc;
+      }
+      .hl-val {
+        color: #86efac;
+      }
+      .hl-cm {
+        color: #4b5563;
+      }
+      .hl-kw {
+        color: #f472b6;
+      }
+      .hl-str {
+        color: #fca5a5;
+      }
+      .hl-attr {
+        color: #fcd34d;
+      }
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        flex: 1;
+      }
+      .three-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+        flex: 1;
+      }
+      .four-col {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 13px;
+        flex: 1;
+      }
+      .tag-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 10px;
+        overflow: hidden;
+        font-size: 12px;
+      }
+      .tag-table tr:nth-child(odd) td:first-child {
+        background: var(--blue);
+      }
+      .tag-table tr:nth-child(even) td:first-child {
+        background: #3a6bee;
+      }
+      .tag-table td:first-child {
+        color: #fff;
+        font-family: "Fira Code", monospace;
+        font-size: 11.5px;
+        padding: 7px 12px;
+        white-space: nowrap;
+        width: 90px;
+        vertical-align: middle;
+      }
+      .tag-table td:last-child {
+        background: #fff;
+        color: var(--sub);
+        padding: 7px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
+      .tag-table tr:last-child td:last-child {
+        border-bottom: none;
+      }
+      .sem-table td:first-child {
+        background: var(--teal) !important;
+      }
+      .sem-table tr:nth-child(even) td:first-child {
+        background: #00a899 !important;
+      }
+      .flow-wrap {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        flex: 1;
+      }
+      .flow-box {
+        background: #fff;
+        border: 2px solid var(--blue-bd);
+        border-radius: 14px;
+        padding: 24px 16px;
+        text-align: center;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 20px rgba(79, 124, 255, 0.08);
+        transition: transform 0.2s;
+      }
+      .flow-box:hover {
+        transform: translateY(-3px);
+      }
+      .flow-fi {
+        font-size: 32px;
+      }
+      .flow-fl {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--blue);
+      }
+      .flow-fd {
+        font-size: 11.5px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .flow-arrow {
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        color: var(--blue-bd);
+        font-size: 22px;
+        font-weight: 900;
+        flex-shrink: 0;
+      }
+      .bm-margin {
+        background: #fef3c7;
+        border: 2px dashed var(--amber);
+        border-radius: 12px;
+        padding: 14px;
+        width: 100%;
+      }
+      .bm-border {
+        background: #fee2e2;
+        border: 2px solid var(--coral);
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 8px;
+      }
+      .bm-padding {
+        background: var(--green-lt);
+        border: 2px dashed var(--green);
+        border-radius: 6px;
+        padding: 10px;
+        margin-top: 8px;
+      }
+      .bm-content {
+        background: var(--blue);
+        color: #fff;
+        border-radius: 4px;
+        padding: 14px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+      .bm-lbl {
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .flex-demo {
+        background: var(--blue-lt);
+        border: 2px solid var(--blue-bd);
+        border-radius: 9px;
+        padding: 9px;
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .flex-demo.col {
+        flex-direction: column;
+      }
+      .fi-box {
+        background: var(--blue);
+        color: #fff;
+        border-radius: 6px;
+        padding: 7px 10px;
+        font-weight: 700;
+        font-size: 12px;
+        text-align: center;
+        flex: 1;
+      }
+      .grid-demo {
+        background: var(--purple-lt);
+        border: 2px solid var(--purple-bd);
+        border-radius: 9px;
+        padding: 9px;
+        display: grid;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .gi-box {
+        background: var(--purple);
+        color: #fff;
+        border-radius: 6px;
+        padding: 7px 10px;
+        font-weight: 700;
+        font-size: 12px;
+        text-align: center;
+      }
+      .pos-demo {
+        position: relative;
+        background: var(--blue-lt);
+        border: 2px solid var(--blue-bd);
+        border-radius: 9px;
+        padding: 9px;
+        min-height: 88px;
+        margin-top: 8px;
+        overflow: hidden;
+      }
+      .p-box {
+        background: var(--blue);
+        color: #fff;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-block;
+        margin: 3px;
+      }
+      .p-box.abs {
+        position: absolute;
+        bottom: 7px;
+        right: 7px;
+        background: var(--coral);
+      }
+      .spec-card {
+        background: #fff;
+        border-radius: 13px;
+        padding: 16px 12px;
+        border: 2px solid var(--border);
+        box-shadow: 0 4px 16px rgba(79, 124, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 7px;
+      }
+      .spec-score {
+        font-size: 34px;
+        font-weight: 900;
+      }
+      .spec-name {
+        font-size: 12.5px;
+        font-weight: 700;
+      }
+      .spec-code {
+        background: var(--code-bg);
+        color: var(--code-fg);
+        font-family: "Fira Code", monospace;
+        font-size: 10.5px;
+        padding: 7px 9px;
+        border-radius: 6px;
+        width: 100%;
+        text-align: left;
+        line-height: 1.6;
+      }
+      .spec-desc {
+        font-size: 11px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .ptable {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .ptable th {
+        background: var(--blue);
+        color: #fff;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: left;
+      }
+      .ptable th:first-child {
+        border-radius: 8px 0 0 0;
+      }
+      .ptable th:last-child {
+        border-radius: 0 8px 0 0;
+      }
+      .ptable td {
+        padding: 8px 12px;
+        font-size: 11.5px;
+        border-bottom: 1px solid var(--border);
+        background: #fff;
+        vertical-align: top;
+      }
+      .ptable tr:last-child td {
+        border-bottom: none;
+      }
+      .ptable tr:hover td {
+        background: var(--blue-lt);
+      }
+      .ptable td:first-child {
+        font-family: "Fira Code", monospace;
+        font-size: 11px;
+        color: var(--coral);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .ptable td:nth-child(2) {
+        color: var(--sub);
+      }
+      .ptable td:last-child {
+        font-family: "Fira Code", monospace;
+        font-size: 10.5px;
+        color: #6b7280;
+      }
+      .unit-card {
+        background: #fff;
+        border-radius: 13px;
+        padding: 18px 15px;
+        border: 1.5px solid var(--border);
+        box-shadow: 0 4px 16px rgba(79, 124, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .unit-val {
+        font-size: 30px;
+        font-weight: 900;
+      }
+      .unit-name {
+        font-size: 12.5px;
+        font-weight: 700;
+      }
+      .unit-when {
+        font-size: 11px;
+        color: var(--sub);
+        background: var(--bg);
+        border-radius: 7px;
+        padding: 6px 10px;
+        line-height: 1.5;
+      }
+      .unit-bar-bg {
+        background: var(--border);
+        border-radius: 4px;
+        height: 5px;
+        margin-top: auto;
+      }
+      .unit-bar {
+        height: 5px;
+        border-radius: 4px;
+      }
+      .imp-box {
+        background: #fff8e1;
+        border: 2px solid var(--amber);
+        border-radius: 11px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .imp-box p {
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .imp-box strong {
+        color: var(--coral);
+      }
+      .info-box {
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-size: 12.5px;
+        line-height: 1.6;
+      }
+      .sum-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        flex: 1;
+      }
+      .sum-item {
+        background: #fff;
+        border-radius: 13px;
+        padding: 16px;
+        border: 1.5px solid var(--border);
+        box-shadow: 0 4px 16px rgba(79, 124, 255, 0.08);
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+      }
+      .sum-icon {
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+      .sum-text h4 {
+        font-size: 12.5px;
+        font-weight: 700;
+        margin-bottom: 3px;
+      }
+      .sum-text p {
+        font-size: 11px;
+        color: var(--sub);
+        line-height: 1.5;
+      }
+      .slide-title-wrap {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+        background: linear-gradient(
+          135deg,
+          #ebf0ff 0%,
+          #f0eeff 50%,
+          #e0f7f4 100%
+        );
+        margin: -36px -56px -48px;
+        padding: 64px 72px;
+      }
+      .title-main {
+        font-size: 52px;
+        font-weight: 900;
+        line-height: 1.15;
+        margin-bottom: 14px;
+      }
+      .title-main span {
+        color: var(--blue);
+      }
+      .title-sub {
+        font-size: 15px;
+        color: var(--sub);
+        margin-bottom: 26px;
+      }
+      .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        background: #fff;
+        border: 1.5px solid var(--blue-bd);
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 5px 14px;
+        border-radius: 20px;
+      }
+      .agenda-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        flex: 1;
+      }
+      .agenda-item {
+        background: #fff;
+        border-radius: 12px;
+        padding: 14px 18px;
+        border: 1.5px solid var(--border);
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        box-shadow: 0 4px 14px rgba(79, 124, 255, 0.07);
+        transition: box-shadow 0.2s;
+      }
+      .agenda-item:hover {
+        box-shadow: 0 8px 26px rgba(79, 124, 255, 0.13);
+      }
+      .agenda-num {
+        font-size: 22px;
+        font-weight: 900;
+        line-height: 1;
+        min-width: 28px;
+      }
+      .agenda-info h3 {
+        font-size: 13.5px;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .agenda-info p {
+        font-size: 11.5px;
+        color: var(--sub);
+      }
+      /* utility demo */
+      .util-demo {
+        background: var(--code-bg);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-top: 8px;
+        font-family: "Fira Code", monospace;
+        font-size: 11.5px;
+        line-height: 2;
+      }
+      .util-cls {
+        color: #fcd34d;
+        margin-right: 4px;
+      }
+      .util-val {
+        color: #86efac;
+      }
+      @media (max-width: 768px) {
+        .slide {
+          padding: 20px 18px 28px;
+        }
+        .nav {
+          padding: 0 14px;
+        }
+        .slide-title-wrap {
+          margin: -20px -18px -28px;
+          padding: 32px 24px;
+        }
+        .title-main {
+          font-size: 32px;
+        }
+        .two-col,
+        .three-col,
+        .four-col,
+        .agenda-grid,
+        .sum-grid {
+          grid-template-columns: 1fr;
+        }
+        .flow-wrap {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .flow-arrow {
+          transform: rotate(90deg);
+          align-self: center;
+          padding: 4px 0;
+        }
+        .s-h {
+          font-size: 21px;
+        }
+        .spec-score {
+          font-size: 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-title">📄 웹 퍼블리싱 기초</div>
+      <div class="nav-right">
+        <button class="nav-btn" onclick="go(-1)">← 이전</button>
+        <span class="nav-counter" id="counter">1 / 15</span>
+        <button class="nav-btn" onclick="go(1)">다음 →</button>
+      </div>
+    </nav>
+    <div class="progress"><div class="progress-fill" id="prog"></div></div>
+    <div class="slides">
+      <!-- ══ S1: 타이틀 ══ -->
+      <div class="slide active">
+        <div class="slide-title-wrap">
+          <div class="title-main">
+            개발 몰라도<br /><span>이해할 수 있는</span><br />웹의 구조와 원리
+          </div>
+          <div class="title-sub">
+            개념 중심 · HTML · CSS · 레이아웃 · 선택자 · 반응형 · Thymeleaf
+          </div>
+          <div class="chips">
+            <span class="chip">HTML</span><span class="chip">CSS</span
+            ><span class="chip">Flexbox</span> <span class="chip">Grid</span
+            ><span class="chip">선택자</span
+            ><span class="chip">가상 선택자</span>
+            <span class="chip">반응형</span><span class="chip">BEM</span
+            ><span class="chip">유틸리티</span
+            ><span class="chip">Thymeleaf</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S2: 목차 ══ -->
+      <div class="slide">
+        <div class="s-label">AGENDA</div>
+        <div class="s-h">오늘 배울 것들</div>
+        <div class="agenda-grid">
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--blue)">01</div>
+            <div class="agenda-info">
+              <h3>웹이 어떻게 작동하나요?</h3>
+              <p>브라우저 · 서버 · HTML/CSS/JS 역할</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--teal)">02</div>
+            <div class="agenda-info">
+              <h3>HTML 구조 읽기</h3>
+              <p>기본 태그 · 시맨틱 태그 · 박스모델</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--coral)">03</div>
+            <div class="agenda-info">
+              <h3>CSS 레이아웃 핵심</h3>
+              <p>Flexbox · Position</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--amber)">04</div>
+            <div class="agenda-info">
+              <h3>CSS 단위</h3>
+              <p>px · % · vw/vh · rem</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--purple)">05</div>
+            <div class="agenda-info">
+              <h3>Flexbox vs Grid</h3>
+              <p>1차원 vs 2차원 · 언제 뭘 쓸까</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--green)">06</div>
+            <div class="agenda-info">
+              <h3>선택자 우선순위</h3>
+              <p>인라인 · ID · Class · !important</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--pink)">07</div>
+            <div class="agenda-info">
+              <h3>가상 선택자</h3>
+              <p>:hover · :nth-child · ::before · ::after</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--teal)">08</div>
+            <div class="agenda-info">
+              <h3>반응형 웹</h3>
+              <p>미디어 쿼리 · 뷰포트 · Mobile First</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--blue)">09</div>
+            <div class="agenda-info">
+              <h3>BEM / OOCSS</h3>
+              <p>CSS 네이밍 방법론 · 재사용 가능한 CSS</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--amber)">10</div>
+            <div class="agenda-info">
+              <h3>유틸리티 클래스</h3>
+              <p>Tailwind 방식 · 원자적 CSS 설계</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--green)">11</div>
+            <div class="agenda-info">
+              <h3>Thymeleaf 기초</h3>
+              <p>th:text · th:each · th:if · 표현식</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <div class="agenda-num" style="color: var(--purple)">12</div>
+            <div class="agenda-info">
+              <h3>Thymeleaf 레이아웃·컴포넌트</h3>
+              <p>th:fragment · th:replace · layout:decorate</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S3: 웹 작동 원리 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 01</div>
+        <div class="s-h">웹이 어떻게 작동하나요?</div>
+        <div class="flow-wrap">
+          <div class="flow-box">
+            <div class="flow-fi">🖥️</div>
+            <div class="flow-fl">브라우저</div>
+            <div class="flow-fd">크롬 · 사파리<br />주소창에 URL 입력</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">
+            <div class="flow-fi">🌐</div>
+            <div class="flow-fl">인터넷</div>
+            <div class="flow-fd">Request 전송<br />(요청)</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">
+            <div class="flow-fi">🗄️</div>
+            <div class="flow-fl">서버</div>
+            <div class="flow-fd">항상 켜진 컴퓨터<br />파일 보관소</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">
+            <div class="flow-fi">📄</div>
+            <div class="flow-fl">HTML 파일</div>
+            <div class="flow-fd">Response 응답<br />브라우저가 화면에 그림</div>
+          </div>
+        </div>
+        <div class="three-col" style="margin-top: 16px">
+          <div class="card">
+            <div class="card-h">
+              <span class="dot" style="background: #e34f26"></span>HTML — 뼈대
+              🏗️
+            </div>
+            <div
+              style="font-size: 12px; color: var(--sub); margin-bottom: 10px"
+            >
+              기둥·벽·창문 위치<br />페이지의 구조와 내용 담당
+            </div>
+            <div class="code">
+              <span class="hl-kw">&lt;div&gt;</span>내용<span class="hl-kw"
+                >&lt;/div&gt;</span
+              >
+              <span class="hl-kw">&lt;p&gt;</span>문단<span class="hl-kw"
+                >&lt;/p&gt;</span
+              >
+              <span class="hl-kw">&lt;h1&gt;</span>제목<span class="hl-kw"
+                >&lt;/h1&gt;</span
+              >
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <span class="dot" style="background: var(--blue)"></span>CSS —
+              인테리어 🎨
+            </div>
+            <div
+              style="font-size: 12px; color: var(--sub); margin-bottom: 10px"
+            >
+              색상·크기·폰트·위치<br />어떻게 보일지 결정
+            </div>
+            <div class="code">
+              <span class="hl-sel">p</span> {
+              <span class="hl-prop">color</span>:
+              <span class="hl-val">blue</span>;
+              <span class="hl-prop">font-size</span>:
+              <span class="hl-val">16px</span>; }
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <span class="dot" style="background: #c09a00"></span>JavaScript —
+              동작 ⚙️
+            </div>
+            <div
+              style="font-size: 12px; color: var(--sub); margin-bottom: 10px"
+            >
+              클릭·애니메이션<br />상호작용과 기능
+            </div>
+            <div class="code">
+              <span class="hl-prop">btn</span>.<span class="hl-kw"
+                >onclick</span
+              >
+              = <span class="hl-kw">function</span>() {
+              <span class="hl-prop">alert</span>(<span class="hl-str"
+                >"클릭!"</span
+              >) }
+            </div>
+          </div>
+        </div>
+        <div
+          class="info-box"
+          style="
+            background: var(--blue-lt);
+            border: 1.5px solid var(--blue-bd);
+            margin-top: 12px;
+          "
+        >
+          💡 <strong>파일이 곧 페이지</strong> —
+          <code
+            style="
+              background: #fff;
+              padding: 1px 6px;
+              border-radius: 4px;
+              font-family: &quot;Fira Code&quot;, monospace;
+              font-size: 11px;
+            "
+            >index.html</code
+          >
+          하나 = 한 페이지. 폴더 구조가 URL 구조가 됩니다.
+        </div>
+      </div>
+
+      <!-- ══ S4: HTML 구조 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 02</div>
+        <div class="s-h">HTML 구조 읽기</div>
+        <div class="two-col">
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <div class="card" style="flex: 1">
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span>알아야
+                할 태그
+              </div>
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+              >
+                <div>
+                  <div
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--blue);
+                      letter-spacing: 1.5px;
+                      margin-bottom: 5px;
+                    "
+                  >
+                    기본 태그
+                  </div>
+                  <table class="tag-table">
+                    <tr>
+                      <td>div</td>
+                      <td>묶음 컨테이너</td>
+                    </tr>
+                    <tr>
+                      <td>p</td>
+                      <td>문단 (본문)</td>
+                    </tr>
+                    <tr>
+                      <td>h1~h3</td>
+                      <td>제목</td>
+                    </tr>
+                    <tr>
+                      <td>a</td>
+                      <td>링크</td>
+                    </tr>
+                    <tr>
+                      <td>img</td>
+                      <td>이미지</td>
+                    </tr>
+                    <tr>
+                      <td>ul/li</td>
+                      <td>목록</td>
+                    </tr>
+                    <tr>
+                      <td>span</td>
+                      <td>텍스트 스타일</td>
+                    </tr>
+                    <tr>
+                      <td>button</td>
+                      <td>버튼</td>
+                    </tr>
+                    <tr>
+                      <td>input</td>
+                      <td>입력창</td>
+                    </tr>
+                    <tr>
+                      <td>form</td>
+                      <td>폼 (서버 전송)</td>
+                    </tr>
+                  </table>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--teal);
+                      letter-spacing: 1.5px;
+                      margin-bottom: 5px;
+                    "
+                  >
+                    시맨틱 태그
+                  </div>
+                  <table class="tag-table sem-table">
+                    <tr>
+                      <td>head</td>
+                      <td>메타정보</td>
+                    </tr>
+                    <tr>
+                      <td>body</td>
+                      <td>화면 전체 영역</td>
+                    </tr>
+                    <tr>
+                      <td>header</td>
+                      <td>페이지 상단</td>
+                    </tr>
+                    <tr>
+                      <td>nav</td>
+                      <td>내비게이션</td>
+                    </tr>
+                    <tr>
+                      <td>main</td>
+                      <td>핵심 본문</td>
+                    </tr>
+                    <tr>
+                      <td>article</td>
+                      <td>독립 콘텐츠</td>
+                    </tr>
+                    <tr>
+                      <td>section</td>
+                      <td>주제별 묶음</td>
+                    </tr>
+                    <tr>
+                      <td>aside</td>
+                      <td>사이드바</td>
+                    </tr>
+                    <tr>
+                      <td>footer</td>
+                      <td>페이지 하단</td>
+                    </tr>
+                  </table>
+                  <div
+                    style="
+                      font-size: 10.5px;
+                      color: var(--sub);
+                      margin-top: 7px;
+                      background: var(--teal-lt);
+                      border-radius: 6px;
+                      padding: 6px 9px;
+                    "
+                  >
+                    💡 div와 기능은 같지만 <strong>의미</strong>를 부여 →
+                    SEO·접근성 향상
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--teal)"></span>블록 vs
+                인라인
+              </div>
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px"
+              >
+                <div
+                  style="
+                    background: var(--teal-lt);
+                    border: 1.5px solid var(--teal-bd);
+                    border-radius: 8px;
+                    padding: 10px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 11px;
+                      font-weight: 700;
+                      color: var(--teal);
+                      margin-bottom: 5px;
+                    "
+                  >
+                    블록 요소
+                  </div>
+                  <code
+                    style="
+                      font-family: &quot;Fira Code&quot;, monospace;
+                      font-size: 11px;
+                    "
+                    >div, p, h1</code
+                  >
+                  <div
+                    style="font-size: 11px; color: var(--sub); margin-top: 5px"
+                  >
+                    줄 전체 차지 · 위아래로 쌓임
+                  </div>
+                </div>
+                <div
+                  style="
+                    background: var(--amber-lt);
+                    border: 1.5px solid #ffd08a;
+                    border-radius: 8px;
+                    padding: 10px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 11px;
+                      font-weight: 700;
+                      color: var(--amber);
+                      margin-bottom: 5px;
+                    "
+                  >
+                    인라인 요소
+                  </div>
+                  <code
+                    style="
+                      font-family: &quot;Fira Code&quot;, monospace;
+                      font-size: 11px;
+                    "
+                    >span, a, img</code
+                  >
+                  <div
+                    style="font-size: 11px; color: var(--sub); margin-top: 5px"
+                  >
+                    내용만큼 차지 · 가로로 나란히
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="display: flex; flex-direction: column">
+            <div class="card-h">
+              <span class="dot" style="background: var(--amber)"></span>📦 박스
+              모델 — 모든 요소는 박스다
+            </div>
+            <div
+              style="
+                flex: 1;
+                display: flex;
+                align-items: center;
+                padding: 4px 0;
+              "
+            >
+              <div class="bm-margin">
+                <div class="bm-lbl" style="color: var(--amber)">
+                  margin — 바깥 여백
+                </div>
+                <div class="bm-border">
+                  <div class="bm-lbl" style="color: var(--coral)">
+                    border — 테두리
+                  </div>
+                  <div class="bm-padding">
+                    <div class="bm-lbl" style="color: var(--green)">
+                      padding — 안쪽 여백
+                    </div>
+                    <div class="bm-content">
+                      content<br /><span style="font-size: 11px; opacity: 0.8"
+                        >실제 내용</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                font-size: 11px;
+                color: var(--sub);
+                text-align: center;
+                margin-top: 8px;
+              "
+            >
+              크기가 의도대로 안 나올 때 → 박스모델 확인!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S5: CSS 레이아웃 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 03</div>
+        <div class="s-h">CSS 레이아웃 핵심</div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-h">
+              <span class="dot" style="background: var(--blue)"></span>① Flexbox
+              — 이것만 알면 대부분 된다
+            </div>
+            <div class="code">
+              <span class="hl-sel">.parent</span> {
+              <span class="hl-prop">display</span>:
+              <span class="hl-val">flex</span>;
+              <span class="hl-prop">justify-content</span>:
+              <span class="hl-val">center</span>;
+              <span class="hl-cm">/* 가로 */</span>
+              <span class="hl-prop">align-items</span>:
+              <span class="hl-val">center</span>;
+              <span class="hl-cm">/* 세로 */</span>
+              <span class="hl-prop">gap</span>:
+              <span class="hl-val">16px</span>;
+              <span class="hl-cm">/* 간격 */</span> }
+            </div>
+            <div class="flex-demo">
+              <div class="fi-box">A</div>
+              <div class="fi-box">B</div>
+              <div class="fi-box">C</div>
+            </div>
+            <div
+              style="
+                margin-top: 10px;
+                background: var(--blue-lt);
+                border-radius: 8px;
+                padding: 9px 12px;
+                font-size: 11.5px;
+              "
+            >
+              <strong>flex-direction: column</strong> → 세로 배치<br />
+              <strong>justify-content: space-between</strong> → 양끝 정렬
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <span class="dot" style="background: var(--coral)"></span>②
+              position — 흐름에서 벗어날 때
+            </div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 7px;
+                margin-bottom: 10px;
+              "
+            >
+              <div
+                style="background: var(--bg); border-radius: 7px; padding: 9px"
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: var(--sub);
+                    margin-bottom: 3px;
+                  "
+                >
+                  static
+                </div>
+                <div style="font-size: 11px; color: var(--sub)">
+                  기본값, 순서대로
+                </div>
+              </div>
+              <div
+                style="
+                  background: var(--blue-lt);
+                  border-radius: 7px;
+                  padding: 9px;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: var(--blue);
+                    margin-bottom: 3px;
+                  "
+                >
+                  relative
+                </div>
+                <div style="font-size: 11px; color: var(--sub)">
+                  원래 자리 기준 이동
+                </div>
+              </div>
+              <div
+                style="
+                  background: var(--coral-lt);
+                  border-radius: 7px;
+                  padding: 9px;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: var(--coral);
+                    margin-bottom: 3px;
+                  "
+                >
+                  absolute
+                </div>
+                <div style="font-size: 11px; color: var(--sub)">
+                  부모 기준 자유 배치
+                </div>
+              </div>
+              <div
+                style="
+                  background: var(--amber-lt);
+                  border-radius: 7px;
+                  padding: 9px;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: var(--amber);
+                    margin-bottom: 3px;
+                  "
+                >
+                  fixed
+                </div>
+                <div style="font-size: 11px; color: var(--sub)">
+                  화면 고정 (내비게이션)
+                </div>
+              </div>
+            </div>
+            <div class="pos-demo">
+              <div class="p-box">일반 요소</div>
+              <div class="p-box">일반 요소</div>
+              <div class="p-box abs">absolute</div>
+            </div>
+            <div style="font-size: 11px; color: var(--sub); margin-top: 6px">
+              absolute는 relative 부모 기준으로 위치 잡힘
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S6: CSS 단위 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 04</div>
+        <div class="s-h">CSS 단위 — 언제 뭘 쓰나요?</div>
+        <div class="four-col">
+          <div class="unit-card">
+            <div class="unit-val" style="color: var(--blue)">px</div>
+            <div class="unit-name">픽셀 (절대값)</div>
+            <div class="unit-when">
+              고정 크기가 필요할 때<br />border · padding
+            </div>
+            <div class="code">
+              border: <span class="hl-val">1px</span>; padding:
+              <span class="hl-val">16px</span>;
+            </div>
+            <div class="unit-bar-bg">
+              <div
+                class="unit-bar"
+                style="width: 90%; background: var(--blue)"
+              ></div>
+            </div>
+          </div>
+          <div class="unit-card">
+            <div class="unit-val" style="color: var(--teal)">%</div>
+            <div class="unit-name">퍼센트 (상대값)</div>
+            <div class="unit-when">부모 기준 비율<br />레이아웃 분할</div>
+            <div class="code">
+              width: <span class="hl-val">50%</span>; margin:
+              <span class="hl-val">5%</span>;
+            </div>
+            <div class="unit-bar-bg">
+              <div
+                class="unit-bar"
+                style="width: 75%; background: var(--teal)"
+              ></div>
+            </div>
+          </div>
+          <div class="unit-card">
+            <div class="unit-val" style="color: var(--coral)">vw<br />vh</div>
+            <div class="unit-name">뷰포트 기준</div>
+            <div class="unit-when">화면 전체 대비<br />풀스크린 섹션</div>
+            <div class="code">
+              height: <span class="hl-val">100vh</span>; width:
+              <span class="hl-val">50vw</span>;
+            </div>
+            <div class="unit-bar-bg">
+              <div
+                class="unit-bar"
+                style="width: 80%; background: var(--coral)"
+              ></div>
+            </div>
+          </div>
+          <div class="unit-card">
+            <div class="unit-val" style="color: var(--purple)">rem</div>
+            <div class="unit-name">루트 폰트 기준</div>
+            <div class="unit-when">반응형 · 접근성<br />1rem = 보통 16px</div>
+            <div class="code">
+              font-size: <span class="hl-val">1.5rem</span>; margin:
+              <span class="hl-val">2rem</span>;
+            </div>
+            <div class="unit-bar-bg">
+              <div
+                class="unit-bar"
+                style="width: 65%; background: var(--purple)"
+              ></div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="info-box"
+          style="
+            background: var(--blue-lt);
+            border: 1.5px solid var(--blue-bd);
+            margin-top: 14px;
+          "
+        >
+          💡 처음엔 <strong>px</strong> 위주로, 레이아웃은
+          <strong>%·flex</strong>, 반응형은 <strong>rem·vw</strong> 조합이 실무
+          기본입니다.
+        </div>
+      </div>
+
+      <!-- ══ S7: Flex vs Grid ══ -->
+      <div class="slide">
+        <div class="s-label">PART 05</div>
+        <div class="s-h">Flexbox vs CSS Grid</div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-h" style="font-size: 15px">
+              <span class="dot" style="background: var(--blue)"></span>Flexbox —
+              1차원 (한 방향)
+            </div>
+            <div
+              style="font-size: 12px; color: var(--sub); margin-bottom: 10px"
+            >
+              가로 <strong>또는</strong> 세로, 한 줄로 배치할 때
+            </div>
+            <div class="code">
+              <span class="hl-sel">.nav</span> {
+              <span class="hl-prop">display</span>:
+              <span class="hl-val">flex</span>;
+              <span class="hl-prop">gap</span>:
+              <span class="hl-val">12px</span>;
+              <span class="hl-prop">align-items</span>:
+              <span class="hl-val">center</span>; }
+            </div>
+            <div class="flex-demo">
+              <div class="fi-box">메뉴1</div>
+              <div class="fi-box">메뉴2</div>
+              <div class="fi-box">메뉴3</div>
+            </div>
+            <div class="flex-demo col" style="margin-top: 7px">
+              <div class="fi-box">항목 A</div>
+              <div class="fi-box">항목 B</div>
+            </div>
+            <div
+              class="info-box"
+              style="
+                background: var(--blue-lt);
+                border: 1px solid var(--blue-bd);
+                font-size: 12px;
+                margin-top: 10px;
+              "
+            >
+              ✅ 내비게이션 · 버튼 그룹 · 카드 한 줄
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h" style="font-size: 15px">
+              <span class="dot" style="background: var(--purple)"></span>CSS
+              Grid — 2차원 (행 + 열 동시)
+            </div>
+            <div
+              style="font-size: 12px; color: var(--sub); margin-bottom: 10px"
+            >
+              행과 열을 <strong>동시에</strong> 제어할 때
+            </div>
+            <div class="code">
+              <span class="hl-sel">.layout</span> {
+              <span class="hl-prop">display</span>:
+              <span class="hl-val">grid</span>;
+              <span class="hl-prop">grid-template-columns</span>:
+              <span class="hl-val">1fr 2fr</span>;
+              <span class="hl-prop">gap</span>:
+              <span class="hl-val">12px</span>; }
+            </div>
+            <div class="grid-demo" style="grid-template-columns: 1fr 1fr 1fr">
+              <div class="gi-box" style="grid-column: 1/-1">헤더</div>
+              <div class="gi-box">사이드바</div>
+              <div class="gi-box" style="grid-column: 2/-1">본문</div>
+              <div class="gi-box" style="grid-column: 1/-1">푸터</div>
+            </div>
+            <div
+              class="info-box"
+              style="
+                background: var(--purple-lt);
+                border: 1px solid var(--purple-bd);
+                font-size: 12px;
+                margin-top: 10px;
+              "
+            >
+              ✅ 전체 페이지 레이아웃 · 카드 그리드 · 대시보드
+            </div>
+          </div>
+        </div>
+        <div
+          style="
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 18px;
+            margin-top: 13px;
+            display: flex;
+            gap: 16px;
+            font-size: 12.5px;
+            align-items: center;
+            flex-wrap: wrap;
+          "
+        >
+          <div>
+            <strong style="color: var(--blue)">Flex</strong> = 한 줄 정렬이 목적
+          </div>
+          <div style="color: var(--border)">|</div>
+          <div>
+            <strong style="color: var(--purple)">Grid</strong> = 행·열 동시
+            배치가 목적
+          </div>
+          <div style="color: var(--border)">|</div>
+          <div style="color: var(--sub)">
+            같이 써도 됩니다 — Grid로 전체 잡고 Flex로 내부 정렬
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S8: 선택자 우선순위 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 06</div>
+        <div class="s-h">선택자 우선순위 (Specificity)</div>
+        <div style="font-size: 13px; color: var(--sub); margin: -14px 0 18px">
+          CSS가 충돌할 때, 점수가 높은 쪽이 이깁니다
+        </div>
+        <div class="four-col">
+          <div class="spec-card" style="border-color: #fecaca">
+            <div
+              style="
+                font-size: 10px;
+                font-weight: 700;
+                background: var(--coral-lt);
+                color: var(--coral);
+                padding: 2px 9px;
+                border-radius: 20px;
+                align-self: flex-start;
+              "
+            >
+              1위
+            </div>
+            <div class="spec-score" style="color: var(--coral)">1000</div>
+            <div class="spec-name">인라인 스타일</div>
+            <div class="spec-code">style="color:red"</div>
+            <div class="spec-desc">HTML 태그에 직접<br />유지보수 어려움</div>
+          </div>
+          <div class="spec-card" style="border-color: var(--blue-bd)">
+            <div
+              style="
+                font-size: 10px;
+                font-weight: 700;
+                background: var(--blue-lt);
+                color: var(--blue);
+                padding: 2px 9px;
+                border-radius: 20px;
+                align-self: flex-start;
+              "
+            >
+              2위
+            </div>
+            <div class="spec-score" style="color: var(--blue)">100</div>
+            <div class="spec-name">ID 선택자</div>
+            <div class="spec-code">
+              <span class="hl-sel">#header</span> { color: blue; }
+            </div>
+            <div class="spec-desc"># 으로 시작<br />페이지에 하나만</div>
+          </div>
+          <div class="spec-card" style="border-color: #a7f3d0">
+            <div
+              style="
+                font-size: 10px;
+                font-weight: 700;
+                background: var(--green-lt);
+                color: var(--green);
+                padding: 2px 9px;
+                border-radius: 20px;
+                align-self: flex-start;
+              "
+            >
+              3위
+            </div>
+            <div class="spec-score" style="color: var(--green)">10</div>
+            <div class="spec-name">Class 선택자</div>
+            <div class="spec-code">
+              <span class="hl-sel">.card</span> { color: green; }
+            </div>
+            <div class="spec-desc">. 으로 시작<br />가장 많이 쓰는 방식</div>
+          </div>
+          <div class="spec-card">
+            <div
+              style="
+                font-size: 10px;
+                font-weight: 700;
+                background: var(--bg);
+                color: var(--sub);
+                padding: 2px 9px;
+                border-radius: 20px;
+                align-self: flex-start;
+              "
+            >
+              4위
+            </div>
+            <div class="spec-score" style="color: var(--sub)">1</div>
+            <div class="spec-name">태그 선택자</div>
+            <div class="spec-code">
+              <span class="hl-sel">p</span> { color: gray; }
+            </div>
+            <div class="spec-desc">태그 이름 그대로<br />기본값에 사용</div>
+          </div>
+        </div>
+        <div class="imp-box">
+          <div style="font-size: 18px; flex-shrink: 0">⚠️</div>
+          <p>
+            <strong>!important</strong> — 점수 무시하고 강제 적용.
+            <code
+              style="
+                background: #fff;
+                padding: 1px 5px;
+                border-radius: 3px;
+                font-family: &quot;Fira Code&quot;, monospace;
+                font-size: 11px;
+              "
+              >color: red !important</code
+            >
+            처럼 씁니다. <strong>남용하면 CSS 수정이 엉망</strong>이 됩니다. 꼭
+            필요할 때만!
+          </p>
+        </div>
+      </div>
+
+      <!-- ══ S9: 가상 선택자 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 07</div>
+        <div class="s-h">가상 선택자 (Pseudo Selector)</div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-h">
+              <span class="dot" style="background: var(--blue)"></span
+              >:pseudo-class — 상태 선택자
+            </div>
+            <table class="ptable">
+              <thead>
+                <tr>
+                  <th>선택자</th>
+                  <th>의미</th>
+                  <th>예시</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>:hover</td>
+                  <td>마우스 올렸을 때</td>
+                  <td>a:hover</td>
+                </tr>
+                <tr>
+                  <td>:focus</td>
+                  <td>포커스됐을 때</td>
+                  <td>input:focus</td>
+                </tr>
+                <tr>
+                  <td>:active</td>
+                  <td>클릭 누르는 순간</td>
+                  <td>button:active</td>
+                </tr>
+                <tr>
+                  <td>:nth-child(n)</td>
+                  <td>n번째 자식</td>
+                  <td>li:nth-child(2)</td>
+                </tr>
+                <tr>
+                  <td>:first-child</td>
+                  <td>첫 번째 자식</td>
+                  <td>p:first-child</td>
+                </tr>
+                <tr>
+                  <td>:last-child</td>
+                  <td>마지막 자식</td>
+                  <td>li:last-child</td>
+                </tr>
+                <tr>
+                  <td>:not(선택자)</td>
+                  <td>해당 제외 전부</td>
+                  <td>p:not(.on)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--coral)"></span
+                >::pseudo-element — 가상 요소
+              </div>
+              <table class="ptable">
+                <thead>
+                  <tr>
+                    <th>선택자</th>
+                    <th>의미</th>
+                    <th>예시</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>::before</td>
+                    <td>요소 앞에 내용 삽입</td>
+                    <td>div::before</td>
+                  </tr>
+                  <tr>
+                    <td>::after</td>
+                    <td>요소 뒤에 내용 삽입</td>
+                    <td>div::after</td>
+                  </tr>
+                  <tr>
+                    <td>::placeholder</td>
+                    <td>placeholder 스타일</td>
+                    <td>input::placeholder</td>
+                  </tr>
+                  <tr>
+                    <td>::selection</td>
+                    <td>드래그 선택 스타일</td>
+                    <td>::selection</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--purple)"></span>실전
+                예시
+              </div>
+              <div class="code">
+                <span class="hl-sel">button:hover</span> {
+                <span class="hl-prop">background</span>:
+                <span class="hl-val">var(--blue)</span>; }
+                <span class="hl-sel">tr:nth-child(odd)</span> {
+                <span class="hl-prop">background</span>:
+                <span class="hl-val">#f5f5f5</span>; }
+                <span class="hl-sel">.item::before</span> {
+                <span class="hl-prop">content</span>:
+                <span class="hl-str">"▶ "</span>;
+                <span class="hl-prop">color</span>:
+                <span class="hl-val">var(--blue)</span>; }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S10: 반응형 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 08</div>
+        <div class="s-h">반응형 웹 (Responsive Web)</div>
+        <div class="two-col">
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span
+                >반응형이란?
+              </div>
+              <div
+                style="
+                  font-size: 12.5px;
+                  color: var(--sub);
+                  line-height: 1.7;
+                  margin-bottom: 12px;
+                "
+              >
+                화면 크기(PC · 태블릿 · 모바일)에 따라 레이아웃이 자동으로
+                바뀌는 웹
+              </div>
+              <div style="display: flex; gap: 14px; align-items: flex-end">
+                <div style="text-align: center">
+                  <div
+                    style="
+                      width: 90px;
+                      height: 58px;
+                      background: var(--blue-lt);
+                      border: 2px solid var(--blue-bd);
+                      border-radius: 6px;
+                      display: grid;
+                      grid-template-columns: 1fr 1fr 1fr;
+                      gap: 4px;
+                      padding: 7px;
+                    "
+                  >
+                    <div
+                      style="background: var(--blue); border-radius: 2px"
+                    ></div>
+                    <div
+                      style="background: var(--blue); border-radius: 2px"
+                    ></div>
+                    <div
+                      style="background: var(--blue); border-radius: 2px"
+                    ></div>
+                    <div
+                      style="
+                        background: var(--blue-bd);
+                        border-radius: 2px;
+                        grid-column: 1/-1;
+                      "
+                    ></div>
+                  </div>
+                  <div
+                    style="font-size: 10px; color: var(--sub); margin-top: 4px"
+                  >
+                    PC — 3열
+                  </div>
+                </div>
+                <div style="text-align: center">
+                  <div
+                    style="
+                      width: 64px;
+                      height: 58px;
+                      background: var(--teal-lt);
+                      border: 2px solid var(--teal-bd);
+                      border-radius: 6px;
+                      display: grid;
+                      grid-template-columns: 1fr 1fr;
+                      gap: 4px;
+                      padding: 7px;
+                    "
+                  >
+                    <div
+                      style="background: var(--teal); border-radius: 2px"
+                    ></div>
+                    <div
+                      style="background: var(--teal); border-radius: 2px"
+                    ></div>
+                    <div
+                      style="
+                        background: var(--teal-bd);
+                        border-radius: 2px;
+                        grid-column: 1/-1;
+                      "
+                    ></div>
+                  </div>
+                  <div
+                    style="font-size: 10px; color: var(--sub); margin-top: 4px"
+                  >
+                    태블릿 — 2열
+                  </div>
+                </div>
+                <div style="text-align: center">
+                  <div
+                    style="
+                      width: 40px;
+                      height: 58px;
+                      background: var(--purple-lt);
+                      border: 2px solid var(--purple-bd);
+                      border-radius: 6px;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 4px;
+                      padding: 6px;
+                    "
+                  >
+                    <div
+                      style="
+                        background: var(--purple);
+                        border-radius: 2px;
+                        flex: 1;
+                      "
+                    ></div>
+                    <div
+                      style="
+                        background: var(--purple);
+                        border-radius: 2px;
+                        flex: 1;
+                      "
+                    ></div>
+                    <div
+                      style="
+                        background: var(--purple-bd);
+                        border-radius: 2px;
+                        flex: 1;
+                      "
+                    ></div>
+                  </div>
+                  <div
+                    style="font-size: 10px; color: var(--sub); margin-top: 4px"
+                  >
+                    모바일 — 1열
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--teal)"></span
+                >viewport 메타 태그 — 필수!
+              </div>
+              <div class="code">
+                <span class="hl-kw">&lt;meta</span>
+                <span class="hl-attr">name</span>=<span class="hl-str"
+                  >"viewport"</span
+                >
+                <span class="hl-attr">content</span>=<span class="hl-str"
+                  >"width=device-width, initial-scale=1.0"</span
+                ><span class="hl-kw">&gt;</span>
+              </div>
+              <div
+                style="font-size: 11.5px; color: var(--sub); margin-top: 8px"
+              >
+                이 태그 없으면 모바일에서 PC 화면을 축소해서 보여줌
+              </div>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="display: flex; flex-direction: column; gap: 12px"
+          >
+            <div class="card-h">
+              <span class="dot" style="background: var(--coral)"></span>미디어
+              쿼리 (Media Query)
+            </div>
+            <div style="font-size: 12px; color: var(--sub)">
+              화면 너비에 따라 다른 CSS를 적용하는 문법
+            </div>
+            <div class="code">
+              <span class="hl-cm">/* 기본: PC용 3열 */</span>
+              <span class="hl-sel">.grid</span> {
+              <span class="hl-prop">display</span>:
+              <span class="hl-val">grid</span>;
+              <span class="hl-prop">grid-template-columns</span>:
+              <span class="hl-val">1fr 1fr 1fr</span>; }
+
+              <span class="hl-cm">/* 태블릿 이하 (768px) */</span>
+              <span class="hl-kw">@media</span> (<span class="hl-prop"
+                >max-width</span
+              >: <span class="hl-val">768px</span>) {
+              <span class="hl-sel">.grid</span> {
+              <span class="hl-prop">grid-template-columns</span>:
+              <span class="hl-val">1fr 1fr</span>; } }
+
+              <span class="hl-cm">/* 모바일 (480px 이하) */</span>
+              <span class="hl-kw">@media</span> (<span class="hl-prop"
+                >max-width</span
+              >: <span class="hl-val">480px</span>) {
+              <span class="hl-sel">.grid</span> {
+              <span class="hl-prop">grid-template-columns</span>:
+              <span class="hl-val">1fr</span>; } }
+            </div>
+            <div
+              class="info-box"
+              style="
+                background: var(--teal-lt);
+                border: 1px solid var(--teal-bd);
+                font-size: 12px;
+              "
+            >
+              💡 <strong>Mobile First</strong> — 모바일 기본 작성 후
+              <code style="font-family: &quot;Fira Code&quot;, monospace"
+                >min-width</code
+              >로 확장하는 방식이 권장됩니다
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S11: BEM / OOCSS ══ -->
+      <div class="slide">
+        <div class="s-label">PART 09</div>
+        <div class="s-h">CSS 방법론 — BEM / OOCSS</div>
+        <div class="two-col">
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span>BEM —
+                Block Element Modifier
+              </div>
+              <div
+                style="font-size: 12px; color: var(--sub); margin-bottom: 10px"
+              >
+                클래스 이름만 보고 구조를 파악할 수 있게 하는 네이밍 규칙
+              </div>
+              <div class="code">
+                <span class="hl-cm">/* Block__Element--Modifier */</span>
+                <span class="hl-sel">.card</span> { }
+                <span class="hl-cm">/* Block */</span>
+                <span class="hl-sel">.card__title</span> { }
+                <span class="hl-cm">/* Element */</span>
+                <span class="hl-sel">.card__button</span> { }
+                <span class="hl-cm">/* Element */</span>
+                <span class="hl-sel">.card--featured</span> { }
+                <span class="hl-cm">/* Modifier */</span>
+                <span class="hl-sel">.card__button--disabled</span> { }
+              </div>
+              <div
+                style="
+                  margin-top: 10px;
+                  background: #fff;
+                  border: 1.5px solid var(--border);
+                  border-radius: 8px;
+                  padding: 12px;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: var(--sub);
+                    margin-bottom: 8px;
+                  "
+                >
+                  HTML 사용 예
+                </div>
+                <div class="code" style="font-size: 11px">
+                  <span class="hl-kw">&lt;div</span>
+                  <span class="hl-attr">class</span>=<span class="hl-str"
+                    >"card card--featured"</span
+                  ><span class="hl-kw">&gt;</span>
+                  <span class="hl-kw">&lt;h2</span>
+                  <span class="hl-attr">class</span>=<span class="hl-str"
+                    >"card__title"</span
+                  ><span class="hl-kw">&gt;</span>제목<span class="hl-kw"
+                    >&lt;/h2&gt;</span
+                  >
+                  <span class="hl-kw">&lt;button</span>
+                  <span class="hl-attr">class</span>=<span class="hl-str"
+                    >"card__button"</span
+                  ><span class="hl-kw">&gt;</span>확인<span class="hl-kw"
+                    >&lt;/button&gt;</span
+                  >
+                  <span class="hl-kw">&lt;/div&gt;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--purple)"></span>OOCSS
+                — 구조와 스킨 분리
+              </div>
+              <div
+                style="font-size: 12px; color: var(--sub); margin-bottom: 10px"
+              >
+                재사용 가능한 CSS를 위해 구조(Structure)와 스킨(Skin)을 분리
+              </div>
+              <div class="code">
+                <span class="hl-cm">/* ❌ 중복 — 안 좋은 방식 */</span>
+                <span class="hl-sel">.btn-blue</span> {
+                <span class="hl-prop">padding</span>:
+                <span class="hl-val">8px 16px</span>;
+                <span class="hl-prop">border-radius</span>:
+                <span class="hl-val">6px</span>;
+                <span class="hl-prop">background</span>:
+                <span class="hl-val">blue</span>; }
+
+                <span class="hl-cm">/* ✅ OOCSS — 구조 / 스킨 분리 */</span>
+                <span class="hl-sel">.btn</span> {
+                <span class="hl-prop">padding</span>:
+                <span class="hl-val">8px 16px</span>;
+                <span class="hl-prop">border-radius</span>:
+                <span class="hl-val">6px</span>; }
+                <span class="hl-sel">.btn--blue</span> {
+                <span class="hl-prop">background</span>:
+                <span class="hl-val">blue</span>; }
+                <span class="hl-sel">.btn--red</span> {
+                <span class="hl-prop">background</span>:
+                <span class="hl-val">red</span>; }
+              </div>
+            </div>
+            <div
+              class="card"
+              style="background: var(--blue-lt); border-color: var(--blue-bd)"
+            >
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span>왜
+                쓰나요?
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 6px;
+                  font-size: 12.5px;
+                "
+              >
+                <div>✅ 클래스명만 봐도 역할 파악 가능</div>
+                <div>✅ CSS 재사용으로 코드량 감소</div>
+                <div>✅ 팀 협업 시 네이밍 충돌 방지</div>
+                <div>✅ 유지보수 시 수정 범위가 명확</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S12: 유틸리티 클래스 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 10</div>
+        <div class="s-h">유틸리티 클래스 (Utility-First CSS)</div>
+        <div style="font-size: 12.5px; color: var(--sub); margin: -14px 0 18px">
+          하나의 클래스 = 하나의 CSS 속성. 조합해서 UI를 만드는 방식 — Tailwind
+          CSS가 대표적
+        </div>
+        <div class="two-col">
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span>BEM
+                방식 vs 유틸리티 방식 비교
+              </div>
+              <div
+                style="
+                  font-size: 11.5px;
+                  font-weight: 700;
+                  color: var(--sub);
+                  margin-bottom: 6px;
+                "
+              >
+                ❌ BEM 방식 — CSS 파일 따로 작성
+              </div>
+              <div class="code">
+                <span class="hl-cm">/* CSS 파일 */</span>
+                <span class="hl-sel">.card</span> {
+                <span class="hl-prop">display</span>:
+                <span class="hl-val">flex</span>;
+                <span class="hl-prop">padding</span>:
+                <span class="hl-val">16px</span>;
+                <span class="hl-prop">background</span>:
+                <span class="hl-val">#fff</span>;
+                <span class="hl-prop">border-radius</span>:
+                <span class="hl-val">8px</span>; }
+                <span class="hl-cm">/* HTML */</span>
+                <span class="hl-kw">&lt;div</span>
+                <span class="hl-attr">class</span>=<span class="hl-str"
+                  >"card"</span
+                ><span class="hl-kw">&gt;</span>...<span class="hl-kw"
+                  >&lt;/div&gt;</span
+                >
+              </div>
+              <div
+                style="
+                  font-size: 11.5px;
+                  font-weight: 700;
+                  color: var(--sub);
+                  margin: 10px 0 6px;
+                "
+              >
+                ✅ 유틸리티 방식 — HTML에서 바로
+              </div>
+              <div class="code">
+                <span class="hl-cm">/* CSS 파일 없음 */</span>
+                <span class="hl-kw">&lt;div</span>
+                <span class="hl-attr">class</span>=<span class="hl-str"
+                  >"flex p-4 bg-white rounded-lg shadow"</span
+                ><span class="hl-kw">&gt;</span> ...<span class="hl-kw"
+                  >&lt;/div&gt;</span
+                >
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--teal)"></span>직접
+                만들 수도 있어요
+              </div>
+              <div
+                style="font-size: 12px; color: var(--sub); margin-bottom: 8px"
+              >
+                자주 쓰는 속성을 단일 클래스로 정의해두면 편리
+              </div>
+              <div class="code">
+                <span class="hl-cm">/* 직접 만드는 유틸리티 */</span>
+                <span class="hl-sel">.flex</span> {
+                <span class="hl-prop">display</span>:
+                <span class="hl-val">flex</span>; }
+                <span class="hl-sel">.hidden</span> {
+                <span class="hl-prop">display</span>:
+                <span class="hl-val">none</span>; }
+                <span class="hl-sel">.w-full</span> {
+                <span class="hl-prop">width</span>:
+                <span class="hl-val">100%</span>; }
+                <span class="hl-sel">.mt-1</span> {
+                <span class="hl-prop">margin-top</span>:
+                <span class="hl-val">4px</span>; }
+                <span class="hl-sel">.mt-2</span> {
+                <span class="hl-prop">margin-top</span>:
+                <span class="hl-val">8px</span>; }
+                <span class="hl-sel">.text-sm</span> {
+                <span class="hl-prop">font-size</span>:
+                <span class="hl-val">12px</span>; }
+                <span class="hl-sel">.bold</span> {
+                <span class="hl-prop">font-weight</span>:
+                <span class="hl-val">700</span>; }
+                <span class="hl-sel">.rounded</span> {
+                <span class="hl-prop">border-radius</span>:
+                <span class="hl-val">8px</span>; }
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--amber)"></span
+                >Tailwind CSS 주요 클래스
+              </div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 8px;
+                  font-size: 11.5px;
+                "
+              >
+                <div>
+                  <div
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--sub);
+                      letter-spacing: 1px;
+                      margin-bottom: 5px;
+                    "
+                  >
+                    레이아웃
+                  </div>
+                  <div class="util-demo">
+                    <span class="util-cls">flex</span> →
+                    <span class="util-val">display:flex</span>
+                    <span class="util-cls">grid</span> →
+                    <span class="util-val">display:grid</span>
+                    <span class="util-cls">hidden</span> →
+                    <span class="util-val">display:none</span>
+                    <span class="util-cls">w-full</span> →
+                    <span class="util-val">width:100%</span>
+                    <span class="util-cls">h-screen</span> →
+                    <span class="util-val">height:100vh</span>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--sub);
+                      letter-spacing: 1px;
+                      margin-bottom: 5px;
+                    "
+                  >
+                    간격·크기
+                  </div>
+                  <div class="util-demo">
+                    <span class="util-cls">p-4</span> →
+                    <span class="util-val">padding:16px</span>
+                    <span class="util-cls">px-4</span> →
+                    <span class="util-val">padding 좌우</span>
+                    <span class="util-cls">mt-2</span> →
+                    <span class="util-val">margin-top:8px</span>
+                    <span class="util-cls">gap-4</span> →
+                    <span class="util-val">gap:16px</span>
+                    <span class="util-cls">rounded</span> →
+                    <span class="util-val">border-radius</span>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--sub);
+                      letter-spacing: 1px;
+                      margin-bottom: 5px;
+                    "
+                  >
+                    정렬
+                  </div>
+                  <div class="util-demo">
+                    <span class="util-cls">items-center</span> →
+                    <span class="util-val">align-items:center</span>
+                    <span class="util-cls">justify-center</span>
+                    → <span class="util-val">justify-content</span>
+                    <span class="util-cls">text-center</span>
+                    → <span class="util-val">text-align:center</span>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 10px;
+                      font-weight: 700;
+                      color: var(--sub);
+                      letter-spacing: 1px;
+                      margin-bottom: 5px;
+                    "
+                  >
+                    색상·텍스트
+                  </div>
+                  <div class="util-demo">
+                    <span class="util-cls">text-sm</span> →
+                    <span class="util-val">font-size 작게</span>
+                    <span class="util-cls">font-bold</span> →
+                    <span class="util-val">font-weight:700</span>
+                    <span class="util-cls">text-blue-500</span>
+                    → <span class="util-val">color:blue</span>
+                    <span class="util-cls">bg-white</span> →
+                    <span class="util-val">background:#fff</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="card"
+              style="background: var(--amber-lt); border-color: #ffd08a"
+            >
+              <div class="card-h">
+                <span class="dot" style="background: var(--amber)"></span>BEM vs
+                유틸리티 — 언제 뭘?
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 7px;
+                  font-size: 12px;
+                "
+              >
+                <div
+                  style="
+                    background: #fff;
+                    border-radius: 7px;
+                    padding: 9px 12px;
+                  "
+                >
+                  <strong style="color: var(--blue)">BEM/OOCSS</strong> —
+                  컴포넌트가 복잡하고 재사용이 많을 때, 디자인 시스템 구축 시
+                </div>
+                <div
+                  style="
+                    background: #fff;
+                    border-radius: 7px;
+                    padding: 9px 12px;
+                  "
+                >
+                  <strong style="color: var(--amber)">유틸리티</strong> — 빠르게
+                  스타일링, CSS 파일 관리 줄이고 싶을 때, Tailwind 사용 시
+                </div>
+                <div
+                  style="
+                    background: #fff;
+                    border-radius: 7px;
+                    padding: 9px 12px;
+                    color: var(--sub);
+                  "
+                >
+                  실무에서는 <strong>혼용</strong>이 일반적 — 공통 컴포넌트는
+                  BEM, 간단한 조정은 유틸리티
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S13: Thymeleaf 기초 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 11</div>
+        <div class="s-h">Thymeleaf 기초 — 데이터 바인딩</div>
+        <div style="font-size: 12.5px; color: var(--sub); margin: -14px 0 16px">
+          Spring과 함께 쓰는 서버사이드 템플릿 엔진 — 서버 데이터를 HTML에
+          바인딩
+        </div>
+        <div class="two-col">
+          <div style="display: flex; flex-direction: column; gap: 13px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--green)"></span>기본
+                설정 — 네임스페이스 선언
+              </div>
+              <div class="code">
+                <span class="hl-kw">&lt;html</span>
+                <span class="hl-attr">xmlns:th</span>=<span class="hl-str"
+                  >"http://www.thymeleaf.org"</span
+                ><span class="hl-kw">&gt;</span>
+              </div>
+              <div
+                style="font-size: 11.5px; color: var(--sub); margin-top: 8px"
+              >
+                html 태그에 th 네임스페이스 선언 필수. 이후
+                <code style="font-family: &quot;Fira Code&quot;, monospace"
+                  >th:</code
+                >
+                속성 사용 가능
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span>th:text
+                / th:value — 데이터 출력
+              </div>
+              <div class="code">
+                <span class="hl-cm">&lt;!-- 텍스트 출력 --&gt;</span>
+                <span class="hl-kw">&lt;p</span>
+                <span class="hl-attr">th:text</span>=<span class="hl-str"
+                  >"${user.name}"</span
+                ><span class="hl-kw">&gt;</span>홍길동<span class="hl-kw"
+                  >&lt;/p&gt;</span
+                >
+
+                <span class="hl-cm">&lt;!-- input 기본값 --&gt;</span>
+                <span class="hl-kw">&lt;input</span>
+                <span class="hl-attr">th:value</span>=<span class="hl-str"
+                  >"${item.price}"</span
+                ><span class="hl-kw">&gt;</span>
+
+                <span class="hl-cm">&lt;!-- 링크 --&gt;</span>
+                <span class="hl-kw">&lt;a</span>
+                <span class="hl-attr">th:href</span>=<span class="hl-str"
+                  >"@{/detail/{id}(id=${item.id})}"</span
+                ><span class="hl-kw">&gt;</span>
+                상세보기
+                <span class="hl-kw">&lt;/a&gt;</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--coral)"></span>th:if
+                / th:unless — 조건부 렌더링
+              </div>
+              <div class="code">
+                <span class="hl-kw">&lt;div</span>
+                <span class="hl-attr">th:if</span>=<span class="hl-str"
+                  >"${user.isAdmin}"</span
+                ><span class="hl-kw">&gt;</span>
+                관리자 메뉴
+                <span class="hl-kw">&lt;/div&gt;</span>
+                <span class="hl-kw">&lt;div</span>
+                <span class="hl-attr">th:unless</span>=<span class="hl-str"
+                  >"${user.isAdmin}"</span
+                ><span class="hl-kw">&gt;</span>
+                일반 사용자 메뉴
+                <span class="hl-kw">&lt;/div&gt;</span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 13px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--purple)"></span
+                >th:each — 반복 렌더링
+              </div>
+              <div class="code">
+                <span class="hl-kw">&lt;ul&gt;</span>
+                <span class="hl-kw">&lt;li</span>
+                <span class="hl-attr">th:each</span>=<span class="hl-str"
+                  >"item : ${items}"</span
+                >
+                <span class="hl-attr">th:text</span>=<span class="hl-str"
+                  >"${item.name}"</span
+                ><span class="hl-kw">&gt;&lt;/li&gt;</span>
+                <span class="hl-kw">&lt;/ul&gt;</span>
+
+                <span class="hl-cm">&lt;!-- 인덱스 포함 --&gt;</span>
+                <span class="hl-kw">&lt;tr</span>
+                <span class="hl-attr">th:each</span>=<span class="hl-str"
+                  >"item, stat : ${list}"</span
+                ><span class="hl-kw">&gt;</span>
+                <span class="hl-kw">&lt;td</span>
+                <span class="hl-attr">th:text</span>=<span class="hl-str"
+                  >"${stat.index + 1}"</span
+                ><span class="hl-kw">&gt;&lt;/td&gt;</span>
+                <span class="hl-kw">&lt;td</span>
+                <span class="hl-attr">th:text</span>=<span class="hl-str"
+                  >"${item.name}"</span
+                ><span class="hl-kw">&gt;&lt;/td&gt;</span>
+                <span class="hl-kw">&lt;/tr&gt;</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--amber)"></span
+                >th:classappend — 동적 클래스
+              </div>
+              <div class="code">
+                <span class="hl-kw">&lt;div</span>
+                <span class="hl-attr">class</span>=<span class="hl-str"
+                  >"card"</span
+                >
+                <span class="hl-attr">th:classappend</span>=<span class="hl-str"
+                  >"${item.active} ? 'card--active' : ''"</span
+                ><span class="hl-kw">&gt; &lt;/div&gt;</span>
+
+                <span class="hl-kw">&lt;span</span>
+                <span class="hl-attr">th:style</span>=<span class="hl-str"
+                  >"'color:' + ${item.color}"</span
+                ><span class="hl-kw">&gt; &lt;/span&gt;</span>
+              </div>
+            </div>
+            <div
+              class="info-box"
+              style="
+                background: var(--green-lt);
+                border: 1.5px solid var(--teal-bd);
+                font-size: 12px;
+              "
+            >
+              💡 <strong>${...}</strong> 변수 &nbsp;|&nbsp;
+              <strong>@{...}</strong> URL &nbsp;|&nbsp;
+              <strong>#{...}</strong> 메시지(i18n) &nbsp;|&nbsp;
+              <strong>*{...}</strong> 선택 변수
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S14: Thymeleaf 레이아웃 ══ -->
+      <div class="slide">
+        <div class="s-label">PART 12</div>
+        <div class="s-h">Thymeleaf 레이아웃 · 컴포넌트</div>
+        <div style="font-size: 12.5px; color: var(--sub); margin: -14px 0 16px">
+          header · footer · 공통 UI를 한 곳에서 관리 — 수정 한 번으로 전 페이지
+          반영
+        </div>
+        <div class="two-col">
+          <div style="display: flex; flex-direction: column; gap: 13px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--green)"></span
+                >th:fragment — 컴포넌트 정의
+              </div>
+              <div
+                style="font-size: 11.5px; color: var(--sub); margin-bottom: 8px"
+              >
+                재사용할 HTML 조각을 fragment로 선언
+              </div>
+              <div class="code">
+                <span class="hl-cm">&lt;!-- fragments/header.html --&gt;</span>
+                <span class="hl-kw">&lt;header</span>
+                <span class="hl-attr">th:fragment</span>=<span class="hl-str"
+                  >"header"</span
+                ><span class="hl-kw">&gt;</span>
+                <span class="hl-kw">&lt;nav&gt;</span>
+                <span class="hl-kw">&lt;a</span>
+                <span class="hl-attr">th:href</span>=<span class="hl-str"
+                  >"@{/}"</span
+                ><span class="hl-kw">&gt;</span>홈<span class="hl-kw"
+                  >&lt;/a&gt;</span
+                >
+                <span class="hl-kw">&lt;a</span>
+                <span class="hl-attr">th:href</span>=<span class="hl-str"
+                  >"@{/about}"</span
+                ><span class="hl-kw">&gt;</span>소개<span class="hl-kw"
+                  >&lt;/a&gt;</span
+                >
+                <span class="hl-kw">&lt;/nav&gt;</span>
+                <span class="hl-kw">&lt;/header&gt;</span>
+
+                <span class="hl-cm">&lt;!-- fragments/footer.html --&gt;</span>
+                <span class="hl-kw">&lt;footer</span>
+                <span class="hl-attr">th:fragment</span>=<span class="hl-str"
+                  >"footer"</span
+                ><span class="hl-kw">&gt;</span>
+                <span class="hl-kw">&lt;p&gt;</span>© 2025 My Site<span
+                  class="hl-kw"
+                  >&lt;/p&gt;</span
+                >
+                <span class="hl-kw">&lt;/footer&gt;</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span
+                >th:replace / th:insert — 삽입
+              </div>
+              <div class="code">
+                <span class="hl-kw">&lt;body&gt;</span>
+
+                <span class="hl-cm"
+                  >&lt;!-- replace: 태그째 교체 (권장) --&gt;</span
+                >
+                <span class="hl-kw">&lt;header</span>
+                <span class="hl-attr">th:replace</span>=<span class="hl-str"
+                  >"~{fragments/header :: header}"</span
+                ><span class="hl-kw">&gt; &lt;/header&gt;</span>
+
+                <span class="hl-kw">&lt;main&gt;</span>페이지 본문<span
+                  class="hl-kw"
+                  >&lt;/main&gt;</span
+                >
+
+                <span class="hl-cm">&lt;!-- insert: 태그 안에 삽입 --&gt;</span>
+                <span class="hl-kw">&lt;div</span>
+                <span class="hl-attr">th:insert</span>=<span class="hl-str"
+                  >"~{fragments/footer :: footer}"</span
+                ><span class="hl-kw">&gt; &lt;/div&gt;</span>
+
+                <span class="hl-kw">&lt;/body&gt;</span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 13px">
+            <div class="card">
+              <div class="card-h">
+                <span class="dot" style="background: var(--purple)"></span
+                >Layout Dialect — 레이아웃 상속
+              </div>
+              <div
+                style="font-size: 11.5px; color: var(--sub); margin-bottom: 8px"
+              >
+                레이아웃 파일 하나를 만들고 페이지별 콘텐츠만 교체
+              </div>
+              <div class="code">
+                <span class="hl-cm">&lt;!-- layouts/default.html --&gt;</span>
+                <span class="hl-kw">&lt;html&gt;&lt;body&gt;</span>
+                <span class="hl-kw">&lt;header</span>
+                <span class="hl-attr">th:replace</span>=<span class="hl-str"
+                  >"~{fragments/header :: header}"</span
+                ><span class="hl-kw">&gt;&lt;/header&gt;</span>
+                <span class="hl-kw">&lt;main</span>
+                <span class="hl-attr">layout:fragment</span>=<span
+                  class="hl-str"
+                  >"content"</span
+                ><span class="hl-kw">&gt;</span>
+                <span class="hl-cm"
+                  >&lt;!-- 각 페이지가 이 부분을 채움 --&gt;</span
+                >
+                <span class="hl-kw">&lt;/main&gt;</span>
+                <span class="hl-kw">&lt;footer</span>
+                <span class="hl-attr">th:replace</span>=<span class="hl-str"
+                  >"~{fragments/footer :: footer}"</span
+                ><span class="hl-kw">&gt;&lt;/footer&gt;</span>
+                <span class="hl-kw">&lt;/body&gt;&lt;/html&gt;</span>
+
+                <span class="hl-cm"
+                  >&lt;!-- page/home.html (개별 페이지) --&gt;</span
+                >
+                <span class="hl-kw">&lt;html</span>
+                <span class="hl-attr">layout:decorate</span>=<span
+                  class="hl-str"
+                  >"~{layouts/default}"</span
+                ><span class="hl-kw">&gt;</span>
+                <span class="hl-kw">&lt;main</span>
+                <span class="hl-attr">layout:fragment</span>=<span
+                  class="hl-str"
+                  >"content"</span
+                ><span class="hl-kw">&gt;</span>
+                <span class="hl-kw">&lt;h1&gt;</span>홈 페이지 내용<span
+                  class="hl-kw"
+                  >&lt;/h1&gt;</span
+                >
+                <span class="hl-kw">&lt;/main&gt;&lt;/html&gt;</span>
+              </div>
+            </div>
+            <div
+              class="card"
+              style="background: var(--blue-lt); border-color: var(--blue-bd)"
+            >
+              <div class="card-h">
+                <span class="dot" style="background: var(--blue)"></span>replace
+                vs insert 차이
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 7px;
+                  font-size: 12px;
+                "
+              >
+                <div
+                  style="
+                    background: #fff;
+                    border-radius: 7px;
+                    padding: 9px 12px;
+                  "
+                >
+                  <strong style="color: var(--blue)">th:replace</strong> — 해당
+                  태그 자체를 fragment로 완전 교체. 태그 중복 없이 깔끔
+                  <span style="color: var(--green); font-weight: 700"
+                    >← 권장</span
+                  >
+                </div>
+                <div
+                  style="
+                    background: #fff;
+                    border-radius: 7px;
+                    padding: 9px 12px;
+                  "
+                >
+                  <strong style="color: var(--purple)">th:insert</strong> — 해당
+                  태그 <strong>안에</strong> fragment 삽입. 감싸는 태그가 한 겹
+                  더 생김
+                </div>
+              </div>
+              <div
+                class="info-box"
+                style="
+                  background: #fff;
+                  border: 1px solid var(--blue-bd);
+                  font-size: 12px;
+                  margin-top: 8px;
+                "
+              >
+                💡 header · footer · nav 등 공통 요소는 fragment로 분리 → 한
+                파일만 수정하면 전 페이지 반영
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ S15: 마무리 ══ -->
+      <div class="slide">
+        <div class="s-label">WRAP UP</div>
+        <div class="s-h">오늘 배운 것 🎉</div>
+        <div class="sum-grid">
+          <div class="sum-item">
+            <div class="sum-icon">🌐</div>
+            <div class="sum-text">
+              <h4>웹 작동 원리</h4>
+              <p>브라우저 → 서버 → HTML<br />HTML · CSS · JS 역할</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">🏗️</div>
+            <div class="sum-text">
+              <h4>HTML 구조</h4>
+              <p>기본 태그 + 시맨틱 태그<br />박스모델 · 블록 vs 인라인</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">📐</div>
+            <div class="sum-text">
+              <h4>CSS 레이아웃</h4>
+              <p>Flexbox · position 4종</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">📏</div>
+            <div class="sum-text">
+              <h4>CSS 단위</h4>
+              <p>px · % · vw/vh · rem</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">⚡</div>
+            <div class="sum-text">
+              <h4>Flex vs Grid</h4>
+              <p>1차원 vs 2차원<br />함께 쓰는 패턴</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">🎯</div>
+            <div class="sum-text">
+              <h4>선택자 우선순위</h4>
+              <p>태그1 · 클래스10<br />ID100 · 인라인1000</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">🎭</div>
+            <div class="sum-text">
+              <h4>가상 선택자</h4>
+              <p>:hover · :nth-child<br />::before · ::after</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">📱</div>
+            <div class="sum-text">
+              <h4>반응형 웹</h4>
+              <p>미디어 쿼리 · Mobile First</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">🧱</div>
+            <div class="sum-text">
+              <h4>BEM / OOCSS</h4>
+              <p>Block__Element--Modifier<br />구조와 스킨 분리</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">⚗️</div>
+            <div class="sum-text">
+              <h4>유틸리티 클래스</h4>
+              <p>1클래스 = 1속성<br />Tailwind CSS 방식</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">🍃</div>
+            <div class="sum-text">
+              <h4>Thymeleaf 기초</h4>
+              <p>th:text · th:each · th:if<br />th:classappend</p>
+            </div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-icon">🧩</div>
+            <div class="sum-text">
+              <h4>Thymeleaf 레이아웃</h4>
+              <p>th:fragment · th:replace<br />layout:decorate</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      let cur = 0;
+      const slides = document.querySelectorAll(".slide");
+      const total = slides.length;
+      function go(d) {
+        slides[cur].classList.remove("active");
+        cur = Math.max(0, Math.min(total - 1, cur + d));
+        slides[cur].classList.add("active");
+        document.getElementById("counter").textContent =
+          `${cur + 1} / ${total}`;
+        document.getElementById("prog").style.width =
+          `${((cur + 1) / total) * 100}%`;
+        window.scrollTo(0, 0);
+      }
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") go(1);
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") go(-1);
+      });
+      document.getElementById("prog").style.width = `${(1 / total) * 100}%`;
+    </script>
+  </body>
+</html>
